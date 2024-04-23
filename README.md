@@ -1,5 +1,5 @@
 ## Messaging App
-This project was built using React, Firebase, MaterialUI, and Tailwind
+This project was built using React, Firebase, MaterialUI, ShadCN, and Tailwind
 
 ### Features:
 - [x] Sign in 

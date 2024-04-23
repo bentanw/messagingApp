@@ -1,6 +1,5 @@
-import React from 'react'
 import firebase from 'firebase/compat/app';
-import { auth } from '../firebase.js'
+import { auth } from '../firebase.jsx'
 
 import { Button, Typography, Box, Paper } from '@material-ui/core'
 import GoogleIcon from '@mui/icons-material/Google';

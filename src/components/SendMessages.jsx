@@ -1,6 +1,6 @@
 import { Input, Button } from '@material-ui/core'
 import { useState } from 'react'
-import { auth, db } from '../firebase'
+import { auth, db } from '@/firebase'
 import firebase from 'firebase/compat/app';
 
 function SendMessages({ scroll }) {

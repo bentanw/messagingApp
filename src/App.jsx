@@ -1,6 +1,6 @@
 import './App.css';
-import SignIn from './components/SignIn';
-import Chat from './components/Chat'
+import SignIn from '@/components/SignIn';
+import Chat from '@/components/Chat'
 import {auth} from './firebase.jsx'
 import {useAuthState} from 'react-firebase-hooks/auth'
 

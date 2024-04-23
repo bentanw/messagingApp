@@ -1,8 +1,18 @@
+import * as React from "react";
+import firebase from "firebase/compat/app";
+import { auth } from "../firebase.jsx";
+
 import { Button, Typography, Box, Paper } from "@material-ui/core";
 import GoogleIcon from "@mui/icons-material/Google";
 
-import firebase from "firebase/compat/app";
-import { auth } from "../firebase.jsx";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import signInBackground from "../assets/background.jpeg";
 
@@ -35,25 +45,25 @@ function SignIn() {
               width: 300,
             }}
           >
-            <Box pt={4}>
-              <Typography variant="h5">React Message Chat</Typography>
-            </Box>
-            <Box pt={2} px={5}>
-              <Typography variant="subtitle2">
-                Sign Into Your Account By Logging Into Your Gmail Account
-              </Typography>
-            </Box>
-            <Box pt={2} pb={4}>
-              <Button
-                size="small"
-                variant="contained"
-                startIcon={<GoogleIcon />}
-                color="primary"
-                onClick={signInWithGoogle}
-              >
-                Sign In With Google
-              </Button>
-            </Box>
+            <Card className="w-[350px]">
+              <CardHeader>
+                <CardTitle>React Message Chat</CardTitle>
+                <CardDescription>
+                  Sign Into Your Account By Logging Into Your Gmail Account
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button
+                  size="small"
+                  variant="contained"
+                  startIcon={<GoogleIcon />}
+                  color="primary"
+                  onClick={signInWithGoogle}
+                >
+                  Sign In With Google
+                </Button>
+              </CardContent>
+            </Card>
           </Box>
         </Box>
       </Paper>

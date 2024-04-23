@@ -1,68 +1,124 @@
-import { useState, useEffect, useRef} from 'react'
-import { db, auth } from '@/firebase'
-import firebase from 'firebase/compat/app';
-import SendMessages from '@/components/SendMessages'
-import { Grid, Button, Box } from '@material-ui/core'
+import { auth, db } from "@/firebase";
+import { Button } from "@material-ui/core";
+import firebase from "firebase/compat/app";
+import { useEffect, useRef, useState } from "react";
+
+import { Input } from "@/components/ui/input";
 
 function Chat() {
+  const scroll = useRef();
 
-  const scroll = useRef()
+  const [messages, setMessages] = useState([]);
+  const [msg, setMsg] = useState("");
 
-  const [messages, setMessages] = useState([])
+  async function sendMessage(e) {
+    console.log(msg);
+    e.preventDefault();
+    const { uid, photoURL } = auth.currentUser;
+
+    await db.collection("messages").add({
+      text: msg,
+      photoURL,
+      uid,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    setMsg("");
+    scroll.current.scrollIntoView({ behavior: "smooth" });
+  }
 
   useEffect(() => {
-    db.collection("messages").orderBy("createdAt").limit(50).onSnapshot(snapshot => {
-      setMessages(snapshot.docs.map(doc => doc.data()))
-    })
-  }, [])
+    db.collection("messages")
+      .orderBy("createdAt")
+      .limit(50)
+      .onSnapshot((snapshot) => {
+        setMessages(snapshot.docs.map((doc) => doc.data()));
+      });
+  }, []);
 
-  function changeAccount(){
-    const provider = new firebase.auth.GoogleAuthProvider()
-    auth.signInWithPopup(provider)
+  function changeAccount() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider);
   }
 
   return (
     <div>
-
-      <Grid container spacing={0} style={{width:'100%'}}>
-
-        <Grid item xs={12} md={10}>
-          <div className='msgs'>
-            {messages.map(({id, text, photoURL, uid}) => (
-              <div>
-                <div key={id} className={`msg ${uid === auth.currentUser.uid ? 'sent' : 'received'}`}>
-                  <img src={photoURL}></img>
-                  <p>{text}</p>
-                </div>
-              </div>
-            ))}
+      <div className="flex h-screen w-full">
+        {/* left side */}
+        <div className="hidden w-64 border-r bg-gray-100 dark:border-gray-800 dark:bg-gray-900 md:block">
+          <div className="flex h-full flex-col">
+            <div className="flex h-16 items-center justify-between border-b px-4 dark:border-gray-800">
+              <h2 className="text-lg font-semibold">Chats</h2>
+            </div>
+            <Button
+              onClick={changeAccount}
+              size="medium"
+              variant="contained"
+              color="primary"
+            >
+              Change Account
+            </Button>
+            <Button
+              onClick={() => auth.signOut()}
+              size="medium"
+              variant="contained"
+              color="info"
+            >
+              Sign Out
+            </Button>
           </div>
-          <SendMessages scroll={scroll}/> 
-          <div ref={scroll}></div>
-        </Grid>
+        </div>
 
-        <Grid item xs={0} md={2}>
-          <Box sx={{bgcolor:"#F5FCFF", height:"100vh", position:"fixed", width:"16.667%", textAlign:"center"}}>
+        {/* right side */}
+        <div className="flex flex-1 flex-col">
+          {/* Top portion */}
+          <div className="flex h-16 items-center justify-between border-b px-4 dark:border-gray-800">
+            <div className="flex items-center gap-2">
+              {/* <Button size="icon" variant="ghost">
+              <SearchIcon className="h-5 w-5" />
+            </Button> */}
+            </div>
+          </div>
 
-            <Box mt={16}>
-              <img src={auth.currentUser.photoURL} className='border-2 border-black rounded-2xl block mx-auto'></img>
-            </Box>
+          {/* chat history */}
+          <div className="flex-1 overflow-auto p-4">
+            <div className="msgs">
+              {messages.map(({ id, text, photoURL, uid }) => (
+                <div>
+                  <div
+                    key={id}
+                    className={`msg ${
+                      uid === auth.currentUser.uid ? "sent" : "received"
+                    }`}
+                  >
+                    <img src={photoURL}></img>
+                    <p>{text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-            <Box mt={4}>
-              <Button onClick={() => {changeAccount()}} variant="contained" color="primary">Change Account</Button>
-            </Box>
-          
-            {/* Sign out button */}
-            <Box mt={2} textAlign="center">
-              <Button onClick={() => auth.signOut()} variant="contained" color="primary">Sign Out</Button>
-            </Box>
-          </Box>
-        </Grid>
-
-      </Grid>
-
+          {/* Message sending */}
+          <div className="border-t py-3 dark:border-gray-800">
+            <div className="flex items-center gap-2">
+              <div className="sendMsg">
+                <Input
+                  className="flex-1"
+                  placeholder="Type your message..."
+                  value={msg}
+                  onChange={(e) => setMsg(e.target.value)}
+                />
+                <Button onClick={sendMessage} variant="primary">
+                  Send
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
-export default Chat 
+export default Chat;

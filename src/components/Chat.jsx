@@ -1,15 +1,26 @@
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 import { auth, db } from "@/firebase";
 import { Button } from "@material-ui/core";
 import firebase from "firebase/compat/app";
-import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-function Chat() {
+const Chat = () => {
   const scroll = useRef();
-
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState("");
+  const [showStatusBar, setShowStatusBar] = React.useState(true);
+  const [showActivityBar, setShowActivityBar] = React.useState(false);
+  const [showPanel, setShowPanel] = React.useState(false);
 
   async function sendMessage(e) {
     console.log(msg);
@@ -66,6 +77,36 @@ function Chat() {
             >
               Sign Out
             </Button>
+
+            {/* Avatar */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">Open</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuCheckboxItem
+                  checked={showStatusBar}
+                  onCheckedChange={setShowStatusBar}
+                >
+                  Status Bar
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={showActivityBar}
+                  onCheckedChange={setShowActivityBar}
+                  disabled
+                >
+                  Activity Bar
+                </DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem
+                  checked={showPanel}
+                  onCheckedChange={setShowPanel}
+                >
+                  Panel
+                </DropdownMenuCheckboxItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

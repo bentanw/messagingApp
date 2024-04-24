@@ -1,45 +1,27 @@
-import * as React from "react";
-import { useEffect, useRef, useState } from "react";
 import { auth, db } from "@/firebase";
 import { Button } from "@material-ui/core";
 import firebase from "firebase/compat/app";
+import * as React from "react";
+import { useEffect, useRef, useState } from "react";
 
-import {
-  Cloud,
-  CreditCard,
-  Github,
-  Keyboard,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  Settings,
-  User,
-  UserPlus,
-  Users,
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuItem,
-  DropdownMenuShortcut,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { Cloud, LogOut } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 const Chat = () => {
   const scroll = useRef();
   const [messages, setMessages] = useState([]);
   const [msg, setMsg] = useState("");
-  const [showStatusBar, setShowStatusBar] = React.useState(true);
-  const [showActivityBar, setShowActivityBar] = React.useState(false);
-  const [showPanel, setShowPanel] = React.useState(false);
   const { uid, photoURL, displayName, email } = auth.currentUser;
 
   async function sendMessage(e) {
@@ -51,6 +33,7 @@ const Chat = () => {
       photoURL,
       uid,
       createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      displayName,
     });
 
     setMsg("");
@@ -76,46 +59,55 @@ const Chat = () => {
       <div className="flex h-screen w-full">
         {/* left side */}
         <div className="hidden w-64 border-r bg-gray-100 dark:border-gray-800 dark:bg-gray-900 md:block">
-          <div className="flex h-full flex-col">
-            <div className="flex h-16 items-center justify-between border-b px-4 dark:border-gray-800">
-              <h2 className="text-lg font-semibold">Chats</h2>
+          <div className="flex h-full flex-col justify-between">
+            <div>
+              <div className="flex h-16 items-center justify-between border-b px-4 dark:border-gray-800">
+                <h2 className="text-lg font-semibold">Chats</h2>
+              </div>
             </div>
 
-            {/* Avatar */}
-            <DropdownMenu>
-              {/* Trigger */}
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <Avatar className="mr-2">
-                    <AvatarImage src={photoURL} />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-col">
-                    <div>{displayName}</div>
-                    <div>{email}</div>
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
+            {/* DropdownMenu at the bottom */}
+            <div className="mb-6">
+              <Separator />
+              <Separator />
 
-              <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+              <DropdownMenu>
+                {/* Trigger */}
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Avatar className="mr-2">
+                      <AvatarImage src={photoURL} />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-col">
+                      <div className="text-base justify-start flex">
+                        {displayName}
+                      </div>
+                      <div className="text-xs">{email}</div>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
 
-                {/* Change account */}
-                <DropdownMenuItem onClick={changeAccount}>
-                  <Cloud className="mr-2 h-4 w-4" />
-                  <span>Change Account</span>
-                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                </DropdownMenuItem>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
 
-                {/* Log out */}
-                <DropdownMenuItem onClick={() => auth.signOut()}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Log out</span>
-                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  {/* Change account */}
+                  <DropdownMenuItem onClick={changeAccount}>
+                    <Cloud className="mr-2 h-4 w-4" />
+                    <span>Change Account</span>
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+
+                  {/* Log out */}
+                  <DropdownMenuItem onClick={() => auth.signOut()}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
 
@@ -133,7 +125,7 @@ const Chat = () => {
           {/* chat history */}
           <div className="flex-1 overflow-auto p-4">
             <div className="msgs">
-              {messages.map(({ id, text, photoURL, uid }) => (
+              {messages.map(({ id, text, photoURL, uid, displayName }) => (
                 <div>
                   <div
                     className={`flex items-end gap-3 ${
@@ -142,7 +134,7 @@ const Chat = () => {
                         : "justify-start"
                     }`}
                   >
-                    <div className="max-w-[75%] space-y-2">
+                    <div className="max-w-[75%] mt-3">
                       <div
                         className={`rounded-t-lg rounded-bl-lg ${
                           uid === auth.currentUser.uid
@@ -159,9 +151,9 @@ const Chat = () => {
                             : "justify-start"
                         }`}
                       >
-                        {/* <p className="text-xs text-gray-500 dark:text-gray-400">
-                          3:59
-                        </p> */}
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {displayName}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -171,20 +163,16 @@ const Chat = () => {
           </div>
 
           {/* Message sending */}
-          <div className="border-t py-3 dark:border-gray-800">
-            <div className="flex items-center gap-2">
-              <div className="sendMsg">
-                <Input
-                  className="flex-1"
-                  placeholder="Type your message..."
-                  value={msg}
-                  onChange={(e) => setMsg(e.target.value)}
-                />
-                <Button onClick={sendMessage} variant="primary">
-                  Send
-                </Button>
-              </div>
-            </div>
+          <div className="flex items-center">
+            <Input
+              className="flex-1"
+              placeholder="Type your message..."
+              value={msg}
+              onChange={(e) => setMsg(e.target.value)}
+            />
+            <Button onClick={sendMessage} variant="primary">
+              Send
+            </Button>
           </div>
         </div>
       </div>

@@ -77,7 +77,7 @@ const SignIn = () => {
               backgroundRepeat: "no-repeat",
               backgroundSize: "cover",
               backgroundPosition: "center",
-              height: "100%",
+              height: "100vh",
             }}
           />
         </div>

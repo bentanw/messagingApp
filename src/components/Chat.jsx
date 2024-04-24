@@ -4,15 +4,34 @@ import { auth, db } from "@/firebase";
 import { Button } from "@material-ui/core";
 import firebase from "firebase/compat/app";
 
+import {
+  Cloud,
+  CreditCard,
+  Github,
+  Keyboard,
+  LifeBuoy,
+  LogOut,
+  Mail,
+  MessageSquare,
+  Plus,
+  PlusCircle,
+  Settings,
+  User,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Chat = () => {
   const scroll = useRef();
@@ -21,11 +40,11 @@ const Chat = () => {
   const [showStatusBar, setShowStatusBar] = React.useState(true);
   const [showActivityBar, setShowActivityBar] = React.useState(false);
   const [showPanel, setShowPanel] = React.useState(false);
+  const { uid, photoURL, displayName, email } = auth.currentUser;
 
   async function sendMessage(e) {
     console.log(msg);
     e.preventDefault();
-    const { uid, photoURL } = auth.currentUser;
 
     await db.collection("messages").add({
       text: msg,
@@ -61,50 +80,40 @@ const Chat = () => {
             <div className="flex h-16 items-center justify-between border-b px-4 dark:border-gray-800">
               <h2 className="text-lg font-semibold">Chats</h2>
             </div>
-            <Button
-              onClick={changeAccount}
-              size="medium"
-              variant="contained"
-              color="primary"
-            >
-              Change Account
-            </Button>
-            <Button
-              onClick={() => auth.signOut()}
-              size="medium"
-              variant="contained"
-              color="info"
-            >
-              Sign Out
-            </Button>
 
             {/* Avatar */}
             <DropdownMenu>
+              {/* Trigger */}
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">Open</Button>
+                <Button variant="outline">
+                  <Avatar className="mr-2">
+                    <AvatarImage src={photoURL} />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-col">
+                    <div>{displayName}</div>
+                    <div>{email}</div>
+                  </div>
+                </Button>
               </DropdownMenuTrigger>
+
               <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem
-                  checked={showStatusBar}
-                  onCheckedChange={setShowStatusBar}
-                >
-                  Status Bar
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={showActivityBar}
-                  onCheckedChange={setShowActivityBar}
-                  disabled
-                >
-                  Activity Bar
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  checked={showPanel}
-                  onCheckedChange={setShowPanel}
-                >
-                  Panel
-                </DropdownMenuCheckboxItem>
+
+                {/* Change account */}
+                <DropdownMenuItem onClick={changeAccount}>
+                  <Cloud className="mr-2 h-4 w-4" />
+                  <span>Change Account</span>
+                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                </DropdownMenuItem>
+
+                {/* Log out */}
+                <DropdownMenuItem onClick={() => auth.signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                  <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -127,13 +136,34 @@ const Chat = () => {
               {messages.map(({ id, text, photoURL, uid }) => (
                 <div>
                   <div
-                    key={id}
-                    className={`msg ${
-                      uid === auth.currentUser.uid ? "sent" : "received"
+                    className={`flex items-end gap-3 ${
+                      uid === auth.currentUser.uid
+                        ? "justify-end"
+                        : "justify-start"
                     }`}
                   >
-                    <img src={photoURL}></img>
-                    <p>{text}</p>
+                    <div className="max-w-[75%] space-y-2">
+                      <div
+                        className={`rounded-t-lg rounded-bl-lg ${
+                          uid === auth.currentUser.uid
+                            ? "bg-primary"
+                            : "bg-amber-800"
+                        } p-3 text-sm text-white`}
+                      >
+                        {text}
+                      </div>
+                      <div
+                        className={`flex ${
+                          uid === auth.currentUser.uid
+                            ? "justify-end"
+                            : "justify-start"
+                        }`}
+                      >
+                        {/* <p className="text-xs text-gray-500 dark:text-gray-400">
+                          3:59
+                        </p> */}
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -160,6 +190,6 @@ const Chat = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Chat;
